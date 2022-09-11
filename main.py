@@ -1,5 +1,7 @@
 import requests
 import os
+import pip
+import argparse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -44,9 +46,17 @@ def main():
         if response.ok:
             return response.json()['link']
 
-    user_input = input()
-    result = count_clicks(TOKEN, user_input) if is_bitlink(user_input) \
-        else shorten_link(TOKEN, user_input)
+    parser = argparse.ArgumentParser(
+        description='Программа сокращает длинные ссылки и показывает '
+                    'количество переходов по ссылке'
+    )
+    parser.add_argument('link', help='Введите длинную ссылку для '
+                                     'сокращения или сокращенную для получения статистики')
+    args = parser.parse_args()
+    bitlink = args.link
+    bitlink_info = is_bitlink(bitlink)
+    result = count_clicks(TOKEN, bitlink) if bitlink_info \
+        else shorten_link(TOKEN, bitlink)
     print(result)
 if __name__ == "__main__":
     main()
