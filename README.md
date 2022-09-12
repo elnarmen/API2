@@ -24,10 +24,10 @@ pip install -r requirements.txt
 Чтобы сократить ссылку, нужно запустить `main.py` передав первым аргументом ссылку которую нужно сократить
 
 ```
-python main.py python main.py https://devman.org/encyclopedia/git/git_project_publishing_checklist/
+python main.py https://devman.org/encyclopedia/git/git_project_publishing_checklist/
 ```
 
 Чтобы получить статистику переходов по короткой ссылке, нужно передать ее в качестве аргумента при запуске
 ```
-python main.py python main.py http://bit.ly/2K31hVw
+python main.py http://bit.ly/2K31hVw
 ```
