@@ -7,9 +7,7 @@ from dotenv import load_dotenv
 
 def shorten_link(token, long_link, headers, base_url):
     url = f'{base_url}bitlinks'
-    payload = {
-        'long_url': long_link
-    }
+    payload = {'long_url': long_link}
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
     bitlink = response.json()['id']
