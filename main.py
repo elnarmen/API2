@@ -27,7 +27,6 @@ def count_clicks(token, bitlink, headers, base_url):
 
 def is_bitlink(link, headers, base_url):
     url = f'{base_url}bitlinks/{link}'
-
     response = requests.get(url, headers=headers)
     if response.ok:
         return True
@@ -53,6 +52,8 @@ def main():
         except requests.exceptions.HTTPError:
             result = "Вы ввели неверный адрес"
     print(result)
+
+
 if __name__ == "__main__":
     load_dotenv()
     main()
