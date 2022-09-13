@@ -1,59 +1,65 @@
 import requests
 import os
-import pip
 import argparse
+import re
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 
-def shorten_link(token, long_link, headers, base_url):
-    url = f'{base_url}bitlinks'
+def strip_scheme(url: str):
+    return re.sub(r'^https?:\/\/', '', url)
+
+
+def shorten_link(token, long_link):
+    url = 'https://api-ssl.bitly.com/v4/bitlinks'
     payload = {'long_url': long_link}
+    headers = {'Authorization': f'Bearer {token}'}
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
     bitlink = response.json()['id']
     return bitlink
 
 
-def count_clicks(token, bitlink, headers, base_url):
-    url = f'{base_url}bitlinks/{bitlink}/clicks/summary'
-    payload = {
-        'units': '-1',
-        'unit': 'day',
-    }
-    response = requests.get(url, headers=headers, params=payload)
+def count_clicks(token, bitlink):
+    bitlink = strip_scheme(bitlink)
+    url = f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}/clicks/summary'
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.json()['total_clicks']
 
 
-def is_bitlink(link, headers, base_url):
-    url = f'{base_url}bitlinks/{link}'
+def is_bitlink(token, link):
+    url = f'https://api-ssl.bitly.com/v4/bitlinks/{strip_scheme(link)}'
+    headers = {'Authorization': f'Bearer {token}'}
     response = requests.get(url, headers=headers)
-    if response.ok:
-        return True
-    return False
+    return response.ok
 
 
 def main():
+    load_dotenv()
     token = os.getenv('BITLY_TOKEN')
-    base_url = 'https://api-ssl.bitly.com/v4/'
-    headers = {'Authorization': f'Bearer {token}'}
     parser = argparse.ArgumentParser(
-        description='Программа сокращает длинные ссылки и показывает '
-                    'количество переходов по ссылке')
-    parser.add_argument('link', help='Введите длинную ссылку'
-                                     ' для сокращения или сокращенную для получения статистики')
+        description='Программа сокращает длинные ссылки' +
+                    ' и показывает количество переходов по ссылке'
+    )
+    parser.add_argument(
+        'link',
+        help='Введите длинную ссылку для сокращения ' +
+             'или сокращенную для получения статистики'
+    )
     args = parser.parse_args()
-    bitlink_info = is_bitlink(args.link, headers, base_url)
-    if bitlink_info:
-        result = f'По вашей ссылке прошли: {count_clicks(token, args.link, headers, base_url)} раз(а)'
+    if is_bitlink(token, args.link):
+        try:
+            print(f'По вашей ссылке прошли: {count_clicks(token, args.link)} раз(а)')
+        except requests.exceptions.HTTPError:
+            print("Ошибка")
     else:
         try:
-            result = f'Битлинк: {shorten_link(token, args.link, headers, base_url)}'
+            print(f'Битлинк: {shorten_link(token, args.link)}')
         except requests.exceptions.HTTPError:
-            result = "Вы ввели неверный адрес"
-    print(result)
+            print("Вы ввели неверный адрес")
 
 
 if __name__ == "__main__":
-    load_dotenv()
     main()
