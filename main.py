@@ -52,8 +52,9 @@ def main():
     if is_bitlink(token, args.link):
         try:
             print(f'По вашей ссылке прошли: {count_clicks(token, args.link)} раз(а)')
-        except requests.exceptions.HTTPError:
-            print("Ошибка")
+        except requests.HTTPError:
+            print("Вы ввели неправильную ссылку или неверный токен.")
+
     else:
         try:
             print(f'Битлинк: {shorten_link(token, args.link)}')
