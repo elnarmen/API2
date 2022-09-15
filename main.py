@@ -41,24 +41,21 @@ def main():
     token = os.getenv('BITLY_TOKEN')
     parser = argparse.ArgumentParser(
         description='''
-            Программа сокращает длинные ссылки
+            Программа сокращает длинные ссылки 
             и показывает количество переходов по ссылке
         '''
     )
-    parser.add_argument
-    (
+    parser.add_argument(
         'link',
         help='''
             Введите длинную ссылку для сокращения
             или сокращенную для получения статистики
         '''
-        )
+    )
     args = parser.parse_args()
     if is_bitlink(token, args.link):
         try:
-            print(f'''
-            По вашей ссылке прошли: {count_clicks(token, args.link)} раз(а)
-            ''')
+            print(f'По вашей ссылке прошли: {count_clicks(token, args.link)} раз(а)')
         except requests.HTTPError:
             print("Вы ввели неправильную ссылку или неверный токен.")
 
